@@ -1,29 +1,26 @@
-import io
-import json
 import os
 import uuid
+import json
 
-from flask import Flask, request, Response
-from tempfile import NamedTemporaryFile
+from fastapi import FastAPI, UploadFile, File, Response
 from faster_whisper import WhisperModel
 
-app = Flask(__name__)
-app.config['DEBUG'] = True
+app = FastAPI()
 
 MODEL_SIZE = 'small'
 UPLOAD_FOLDER = 'uploaded_files'
 ALLOWED_EXTENSIONS = {'wav','mp3'}
 
-@app.route('/', methods=['GET'])
-def home():
+@app.get("/")
+async def home():
     return {"success": True, "message": "Hello World from VTT FW"}
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/test_mp3', methods=['GET'])
-def test_mp3():
+@app.get('/test_mp3')
+async def test_mp3():
     model_size = "small"
     model = WhisperModel(model_size, compute_type="int8")
     segments, info = model.transcribe("audiobook.mp3")
@@ -33,8 +30,8 @@ def test_mp3():
     del model
     return {'success': True, 'data':data}
 
-@app.route('/test_wav', methods=['GET'])
-def test_wav():
+@app.get('/test_wav')
+async def test_wav():
     model_size = "small"
     model = WhisperModel(model_size, compute_type="int8")
     segments, info = model.transcribe("indonesian.wav")
@@ -44,41 +41,45 @@ def test_wav():
     del model
     return {'success': True, 'data':data}
 
-@app.route('/transcript', methods=['POST'])
-def transcript():
+@app.post('/transcript')
+async def transcript(audio_file: UploadFile = File(...)):
 
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+     
     # 01 field, files Validation
-    audio_file = request.files.get("audio_file")
     if not audio_file :
-        return {
+        json_data = json.dumps({
             'data': False,
             'success': False,
             'message': 'Failed transcript audio to text, Request field audio_file is requied and must be audio file .mp3 or .wav',
-        }
+        })
+        response = Response(json_data, status_code=422)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
     # 02 format validation 
     allowed = allowed_file(audio_file.filename)
     if not allowed :
-        return {
+        json_data = json.dumps({
             'data': False,
             'success': False,
             'message': f'Failed transcript audio to text, File Name {audio_file.filename} Not Allowed',
-        }
+        })
+        response = Response(json_data, status_code=422)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
+    # 03 tempFile
+    tempFile = os.path.join(UPLOAD_FOLDER, f'{str(uuid.uuid4())}_{audio_file.filename}')
 
-    # 03 Write unique file
-    tempName = str(uuid.uuid4())
-    tempFile = os.path.join(UPLOAD_FOLDER, f'{tempName}_{audio_file.filename}')
-    
     # 04 Read Open & Write audio data to file uploaded files
-    audio_data = audio_file.read()
+    audio_data = audio_file.file.read()
     with open(tempFile, 'wb') as f:
         f.write(audio_data)
 
     # 05 load model and start transcribe audio to text
-    model = WhisperModel(MODEL_SIZE, compute_type="int8")
+    model = WhisperModel(MODEL_SIZE, compute_type="auto", device="auto")
     segments, info = model.transcribe(tempFile)
     data = ''
     for segment in segments:
@@ -92,8 +93,8 @@ def transcript():
 
     return {'success': True, 'data':data}
 
-@app.route('/clear_uploaded_files', methods=['GET'])
-def clear_uploaded_files():
+@app.get('/clear_uploaded_files')
+async def clear_uploaded_files():
     paths = UPLOAD_FOLDER
     lenFile = 0
     for f in os.listdir(paths):
@@ -104,4 +105,5 @@ def clear_uploaded_files():
     return {'message' : 'Removed ' + removedStr + ' Files'}
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    import uvicorn
+    uvicorn.run("app:app", host='0.0.0.0', port=5000, reload=True)

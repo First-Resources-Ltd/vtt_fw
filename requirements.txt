@@ -1,2 +1,4 @@
-Flask
+python-multipart
+fastapi
+uvicorn[standard]
 faster-whisper
