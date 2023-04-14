@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile
-    image: marvinhris/vtt_fw:1.0.3_fast_api_with_model
+    image: marvinhris/vtt_fw:fastapi
     container_name: container_vtt_fw
     working_dir: /app
     stdin_open: true
