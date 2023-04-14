@@ -12,7 +12,7 @@ UPLOAD_FOLDER = 'uploaded_files'
 ALLOWED_EXTENSIONS = {'wav','mp3'}
 
 @app.get("/")
-async def home():
+def home():
     return {"success": True, "message": "Hello World from VTT FW"}
 
 def allowed_file(filename):
@@ -20,7 +20,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.get('/test_mp3')
-async def test_mp3():
+def test_mp3():
     model_size = "small"
     model = WhisperModel(model_size, compute_type="int8")
     segments, info = model.transcribe("audiobook.mp3")
@@ -31,7 +31,7 @@ async def test_mp3():
     return {'success': True, 'data':data}
 
 @app.get('/test_wav')
-async def test_wav():
+def test_wav():
     model_size = "small"
     model = WhisperModel(model_size, compute_type="int8")
     segments, info = model.transcribe("indonesian.wav")
@@ -42,7 +42,7 @@ async def test_wav():
     return {'success': True, 'data':data}
 
 @app.post('/transcript')
-async def transcript(audio_file: UploadFile = File(...)):
+def transcript(audio_file: UploadFile = File(...)):
 
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
@@ -94,7 +94,7 @@ async def transcript(audio_file: UploadFile = File(...)):
     return {'success': True, 'data':data}
 
 @app.get('/clear_uploaded_files')
-async def clear_uploaded_files():
+def clear_uploaded_files():
     paths = UPLOAD_FOLDER
     lenFile = 0
     for f in os.listdir(paths):
