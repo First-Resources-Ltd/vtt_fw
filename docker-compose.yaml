@@ -2,7 +2,7 @@ version: '3'
 services:
   vtt_fw:
     build:
-      context: https://marvin-hris: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@github.com/First-Resources-Ltd/flask.git#small
+      context: https://marvin-hris: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@github.com/First-Resources-Ltd/vtt_fw.git#flask_1.0.0_small
     image: marvinhris/vtt_fw:flask
     container_name: container_vtt_fw
     working_dir: /app
