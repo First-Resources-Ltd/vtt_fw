@@ -2,18 +2,16 @@ version: '3'
 services:
   vtt_fw:
     build:
-      context: https://marvin-hris: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@github.com/First-Resources-Ltd/flask.git
+      context: https://marvin-hris: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@github.com/First-Resources-Ltd/flask.git#small
     image: marvinhris/vtt_fw:flask
     container_name: container_vtt_fw
     working_dir: /app
     stdin_open: true
     tty: true
     restart: always
-    ports:
-      - "8080:5000"
     deploy:
       resources:
         limits:
           memory: 8192M
     memswap_limit: 8200M
-    command: gunicorn -w 4 -b 0.0.0.0:5000 wsgi:server
+    command: gunicorn -w 4 -b 0.0.0.0:8080 wsgi:server
