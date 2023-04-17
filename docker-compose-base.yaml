@@ -1,0 +1,34 @@
+version: '3'
+services:
+  vtt_fw:
+    build: 
+      context: .
+      dockerfile: dockerfile
+    image: marvinhris/vtt_fw:flask_${MODEL_SIZE}
+    env_file:
+      - base.env
+    container_name: ${CONTAINER_NAME}
+    working_dir: /${WORK_DIR}
+    stdin_open: true
+    tty: true
+    restart: ${RESTART}
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY}
+    memswap_limit: ${SWAP_LIMIT}
+    expose:
+      - ${EXPOSE_PORT}
+    ports:
+      - ${PORT}:${EXPOSE_PORT}
+    command: >
+        bash -c "
+        if [ -f "${MODEL_DIRECTORY}/${CONFIG_NAME}" ]; then
+            echo "${MODEL_DIRECTORY}/${CONFIG_NAME} exists."
+        else 
+            wget -O ${MODEL_DIRECTORY}/${CONFIG_NAME} ${MODEL_URL}/${CONFIG_NAME}
+        fi
+        && wget -O ${MODEL_DIRECTORY}/${TOKENIZER_NAME} ${MODEL_URL}/${TOKENIZER_NAME}
+        && wget -O ${MODEL_DIRECTORY}/${VOCABULARY_NAME} ${MODEL_URL}/${VOCABULARY_NAME}
+        && gunicorn -w ${WORKER} -b 0.0.0.0:${EXPOSE_PORT} wsgi:server"
+
