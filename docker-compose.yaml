@@ -8,10 +8,9 @@ services:
     env_file:
       - .env
     container_name: ${CONTAINER_NAME}
-    stdin_open: true
-    tty: true
-    restart: ${RESTART}
     deploy:
+      restart_policy:
+        condition: ${RESTART}
       resources:
         limits:
           memory: ${MEMORY}
@@ -23,3 +22,13 @@ services:
     command: >
       bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} wsgi:server"
 
+    networks:
+      - mynetwork
+    # volumes:
+    #   - myvolume:/app
+
+networks:
+  mynetwork:
+
+# volumes:
+#   myvolume:
