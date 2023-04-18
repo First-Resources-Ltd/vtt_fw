@@ -1,3 +1,5 @@
+import os
+
 # Number of worker processes to spawn
 workers = 4
 
@@ -5,7 +7,7 @@ workers = 4
 threads = 2
 
 # Bind to this address:port
-bind = "127.0.0.1:8000"
+bind = f"0.0.0.0:${os.environ['EXPOSE_PORT']}"
 
 # Worker class (sync, eventlet, gevent, gthread, tornado)
 worker_class = "gevent"
@@ -17,16 +19,13 @@ max_requests = 1000
 timeout = 300
 
 # Access log file (None for no log)
-accesslog = "/var/log/gunicorn/access.log"
+# accesslog = "/var/log/gunicorn/access.log"
 
 # Error log file (None for no log)
-errorlog = "/var/log/gunicorn/error.log"
+# errorlog = "/var/log/gunicorn/error.log"
 
 # Log level (debug, info, warning, error, critical)
-loglevel = "debug"
-
-# port
-port = 8081
+# loglevel = "debug"
 
 # Path to the application WSGI script
 # This assumes the app variable is defined in the file `app.py`
@@ -34,4 +33,5 @@ port = 8081
 # You can also specify the module and application name separately
 # using the format: module:application
 # For example: "myapp.app:myapp"
+# wsgi.py & app.py named server
 wsgi_app = "wsgi:server"
