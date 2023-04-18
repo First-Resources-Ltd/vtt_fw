@@ -19,10 +19,10 @@ max_requests = 1000
 timeout = 300
 
 # Access log file (None for no log)
-# accesslog = "/var/log/gunicorn/access.log"
+accesslog = "/var/log/gunicorn/access.log"
 
 # Error log file (None for no log)
-# errorlog = "/var/log/gunicorn/error.log"
+errorlog = "/var/log/gunicorn/error.log"
 
 # Log level (debug, info, warning, error, critical)
 # loglevel = "debug"

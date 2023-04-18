@@ -17,4 +17,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy source code
 COPY . .
 
+RUN touch /var/log/gunicorn/error.log
+RUN chmod 666 /var/log/gunicorn/error.log
+
+RUN touch /var/log/gunicorn/access.log
+RUN chmod 666 /var/log/gunicorn/access.log
+
+
 CMD ["gunicorn", "gunicorn.conf.py"]
