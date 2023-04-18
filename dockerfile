@@ -9,12 +9,11 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy requirements file and install dependencies
-RUN pip install --upgrade pip
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
 # Copy source code
 COPY . .
 
-# CMD ["gunicorn", "gunicorn.conf.py"]
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# install dependencies
+RUN pip install -r requirements.txt

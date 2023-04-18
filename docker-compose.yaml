@@ -8,7 +8,6 @@ services:
     env_file:
       - .env
     container_name: ${CONTAINER_NAME}
-    working_dir: /${WORK_DIR}
     stdin_open: true
     tty: true
     restart: ${RESTART}
@@ -22,5 +21,5 @@ services:
     ports:
       - ${PORT}:${EXPOSE_PORT}
     command: >
-      bash -c "gunicorn gunicorn.conf.py;"
+      bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=300 wsgi:server"
 
