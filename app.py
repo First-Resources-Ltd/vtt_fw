@@ -1,6 +1,6 @@
+import os
 import io
 import json
-import os
 import uuid
 
 from flask import Flask, request, Response
