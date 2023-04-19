@@ -1,0 +1,80 @@
+version: '3'
+services:
+  voice_to_text_base:
+    build: 
+      context: https://github.com/FirstResources/vtt_fw.git#${BRANCH}
+      args:
+        - GIT_AUTH_TOKEN=${GIT_PAT}
+        - GIT_BRANCH=${BRANCH}
+      dockerfile: dockerfile
+    image: marvinhris/vtt_fw:flask_${MODEL_SIZE}
+    env_file:
+      - base.env
+    container_name: ${CONTAINER_NAME}
+    stdin_open: true
+    tty: true
+    restart: ${RESTART}
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY}
+    memswap_limit: ${SWAP_LIMIT}
+    expose:
+      - ${EXPOSE_PORT}
+    ports:
+      - ${PORT}:${EXPOSE_PORT}
+    command: >
+      bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} wsgi:server"
+
+  voice_to_text_small:
+    build: 
+      context: https://github.com/FirstResources/vtt_fw.git#${BRANCH}
+      args:
+        - GIT_AUTH_TOKEN=${GIT_PAT}
+        - GIT_BRANCH=${BRANCH}
+      dockerfile: dockerfile
+    image: marvinhris/vtt_fw:flask_${MODEL_SIZE}
+    env_file:
+      - small.env
+    container_name: ${CONTAINER_NAME}
+    stdin_open: true
+    tty: true
+    restart: ${RESTART}
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY}
+    memswap_limit: ${SWAP_LIMIT}
+    expose:
+      - ${EXPOSE_PORT}
+    ports:
+      - ${PORT}:${EXPOSE_PORT}
+    command: >
+      bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} wsgi:server"
+      
+  voice_to_text_medium:
+    build: 
+      context: https://github.com/FirstResources/vtt_fw.git#${BRANCH}
+      args:
+        - GIT_AUTH_TOKEN=${GIT_PAT}
+        - GIT_BRANCH=${BRANCH}
+      dockerfile: dockerfile
+    image: marvinhris/vtt_fw:flask_${MODEL_SIZE}
+    env_file:
+      - medium.env
+    container_name: ${CONTAINER_NAME}
+    stdin_open: true
+    tty: true
+    restart: ${RESTART}
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY}
+    memswap_limit: ${SWAP_LIMIT}
+    expose:
+      - ${EXPOSE_PORT}
+    ports:
+      - ${PORT}:${EXPOSE_PORT}
+    command: >
+      bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} wsgi:server"
+

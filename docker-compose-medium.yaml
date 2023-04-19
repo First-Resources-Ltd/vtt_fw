@@ -1,14 +1,16 @@
 version: '3'
 services:
-  vtt_fw:
+  voice_to_text_medium:
     build: 
-      context: .
+      context: https://github.com/FirstResources/vtt_fw.git#${BRANCH}
+      args:
+        - GIT_AUTH_TOKEN=${GIT_PAT}
+        - GIT_BRANCH=${BRANCH}
       dockerfile: dockerfile
     image: marvinhris/vtt_fw:flask_${MODEL_SIZE}
     env_file:
       - medium.env
     container_name: ${CONTAINER_NAME}
-    working_dir: /${WORK_DIR}
     stdin_open: true
     tty: true
     restart: ${RESTART}
@@ -22,11 +24,5 @@ services:
     ports:
       - ${PORT}:${EXPOSE_PORT}
     command: >
-        bash -c "rm -rf ${MODEL_DIRECTORY} 
-        && mkdir ${MODEL_DIRECTORY}
-        && wget -O ${MODEL_DIRECTORY}/${CONFIG_NAME} ${MODEL_URL}/${CONFIG_NAME}
-        && wget -O ${MODEL_DIRECTORY}/${TOKENIZER_NAME} ${MODEL_URL}/${TOKENIZER_NAME}
-        && wget -O ${MODEL_DIRECTORY}/${VOCABULARY_NAME} ${MODEL_URL}/${VOCABULARY_NAME}
-        && wget -O ${MODEL_DIRECTORY}/${MODEL_NAME} ${MODEL_URL}/${MODEL_NAME}
-        && gunicorn -w ${WORKER} -b 0.0.0.0:${EXPOSE_PORT} wsgi:server"
+      bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} wsgi:server"
 
