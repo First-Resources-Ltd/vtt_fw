@@ -8,11 +8,6 @@ services:
     env_file:
       - .env
     container_name: ${CONTAINER_NAME}
-    x-develop:
-      watch:
-        - action: sync
-          path: /app
-          target: /app
     stdin_open: true
     tty: true
     restart: ${RESTART}
