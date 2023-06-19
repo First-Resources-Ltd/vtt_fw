@@ -8,6 +8,11 @@ services:
     env_file:
       - .env
     container_name: ${CONTAINER_NAME}
+    x-develop:
+      watch:
+        - action: sync
+          path: /app
+          target: /app
     stdin_open: true
     tty: true
     restart: ${RESTART}
@@ -22,4 +27,3 @@ services:
       - ${PORT}:${EXPOSE_PORT}
     command: >
       bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} wsgi:server"
-
