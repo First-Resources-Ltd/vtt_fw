@@ -10,7 +10,7 @@ from faster_whisper import WhisperModel
 server = Flask(__name__)
 server.config['DEBUG'] = os.environ['DEBUG']
 
-modelPath = os.environ['MODEL_SIZE']
+modelPath = os.environ['MODEL_PATH']
 
 @server.route('/', methods=['GET'])
 def home():
