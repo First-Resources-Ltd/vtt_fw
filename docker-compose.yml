@@ -22,3 +22,8 @@ services:
       - ${PORT}:${EXPOSE_PORT}
     command: >
       bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} wsgi:server"
+  restarter:
+    image: docker:cli
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    command: ["/bin/sh", "-c", "while true; do sleep 86400; docker restart ${CONTAINER_NAME}; done"]
+    restart: ${RESTART}
