@@ -75,7 +75,7 @@ def transcript():
 
     # 05 load model and start transcribe audio to text
     model = WhisperModel(modelPath, compute_type="int8")
-    segments, info = model.transcribe(tempFile)
+    segments, info = model.transcribe(tempFile, beam_size=1)
     data = ''
     for segment in segments:
         data += segment.text
