@@ -23,7 +23,7 @@ def allowed_file(filename):
 @server.route('/test_mp3', methods=['GET'])
 def test_mp3():
     model = WhisperModel(modelPath, compute_type="int8")
-    segments, info = model.transcribe("audiobook.mp3")
+    segments, info = model.transcribe("audiobook.mp3", beam_size=1)
     data = ''
     for segment in segments:
         data += segment.text
