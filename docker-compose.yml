@@ -1,13 +1,13 @@
 version: '3'
 services:
-  voice_to_text:
+  voice-to-text:
     build: 
       context: .
       dockerfile: dockerfile
-    image: marvinhris/vtt_fw
+    image: "marvinhris/${IMAGE_NAME}"
     env_file:
       - .env
-    container_name: ${CONTAINER_NAME}
+    container_name: "${IMAGE_NAME}-container"
     stdin_open: true
     tty: true
     restart: ${RESTART}
@@ -24,7 +24,7 @@ services:
       bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} --reload wsgi:server"
   restarter:
     image: docker:cli
-    container_name: "${CONTAINER_NAME}-restarter"
+    container_name: "${IMAGE_NAME}-restarter"
     volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-    command: ["/bin/sh", "-c", "while true; do sleep 86400; docker restart ${CONTAINER_NAME}; done"]
+    command: ["/bin/sh", "-c", "while true; do sleep 86400; docker restart ${IMAGE_NAME}-container; done"]
     restart: ${RESTART}
