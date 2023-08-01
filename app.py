@@ -138,7 +138,6 @@ def transcript_new():
     with open(tempFile, 'wb') as f:
         f.write(audio_data)
         f.close()
-
     # 05 Set up a process manager
     process_manager = Manager()
     shared_data = process_manager.dict()
@@ -153,7 +152,6 @@ def transcript_new():
     # 07 Remove uploaded file
     if os.path.isfile(tempFile):
         os.remove(tempFile)
-
 
     # 08 Get transcription from shared data and delete
     data = shared_data["result"]
