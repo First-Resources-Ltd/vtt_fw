@@ -18,12 +18,15 @@ COPY . .
 # Upgrade pip
 RUN pip install --upgrade pip
 
-# install dependencies
-RUN pip install -r requirements.txt
-
 # handle error log gunicorn
 RUN touch /var/log/gunicorn/error.log && \
     chmod 777 /var/log/gunicorn/error.log
+
+# install dependencies
+#RUN pip install -r requirements.txt
+RUN pip install flask
+RUN pip install gunicorn
+RUN pip install faster-whisper
 
 # Create model Directory in home
 RUN mkdir -p /home/data

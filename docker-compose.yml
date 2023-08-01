@@ -7,13 +7,14 @@ services:
     image: "marvinhris/${IMAGE_NAME}"
     env_file:
       - .env
-    container_name: "${IMAGE_NAME}-container"
+    container_name: "${CONTAINER_NAME}"
     stdin_open: true
     tty: true
     restart: ${RESTART}
     deploy:
       resources:
         limits:
+          cpus: ${CPU}
           memory: ${MEMORY}
     memswap_limit: ${SWAP_LIMIT}
     expose:
@@ -21,10 +22,10 @@ services:
     ports:
       - ${PORT}:${EXPOSE_PORT}
     command: >
-      bash -c "gunicorn --workers=${WORKER_TOTAL} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER} --timeout=${TIMEOUT} --reload wsgi:server"
+      bash -c "gunicorn --workers=${WORKERS} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER_CLASS} --timeout=${TIMEOUT} --access-logfile=${ACCESS_LOG_FILE} --error-logfile=${ERROR_LOG_FILE} --log-level=${LOG_LEVEL} --reload wsgi:server "
   restarter:
     image: docker:cli
-    container_name: "${IMAGE_NAME}-restarter"
+    container_name: "${RESTARTER_NAME}"
     volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
-    command: ["/bin/sh", "-c", "while true; do sleep 86400; docker restart ${IMAGE_NAME}-container; done"]
+    command: ["/bin/sh", "-c", "while true; do sleep ${SLEEP_TIME}; docker restart ${CONTAINER_NAME}; done"]
     restart: ${RESTART}
