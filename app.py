@@ -27,22 +27,46 @@ def allowed_file(filename):
 
 @server.route('/test_mp3', methods=['GET'])
 def test_mp3():
-    model = WhisperModel(modelPath, compute_type="int8")
-    segments, info = model.transcribe("audiobook.mp3", beam_size=1)
-    data = ''
-    for segment in segments:
-        data += segment.text
-    del model
+    tempFile = "audiobook.mp3"
+    # 05 Set up a process manager
+    process_manager = Manager()
+    shared_data = process_manager.dict()
+    
+    # 06 Create child process for whisper execution
+    p = Process(target=_do_transcribe, args=(shared_data, "result", tempFile))
+    
+    p.start()      # run child process
+    p.join()       # wait for the process to complete
+    p.terminate()  # terminate the process (optional - should happen automatically)
+
+    # 07 Remove uploaded file
+    if os.path.isfile(tempFile):
+        os.remove(tempFile)
+
+    # 08 Get transcription from shared data and delete
+    data = shared_data["result"]
     return {'success': True, 'data':data}
 
 @server.route('/test_wav', methods=['GET'])
 def test_wav():
-    model = WhisperModel(modelPath, compute_type="int8")
-    segments, info = model.transcribe("indonesian.wav")
-    data = ''
-    for segment in segments:
-        data += segment.text
-    del model
+    tempFile = "indonesian.wav"
+    # 05 Set up a process manager
+    process_manager = Manager()
+    shared_data = process_manager.dict()
+    
+    # 06 Create child process for whisper execution
+    p = Process(target=_do_transcribe, args=(shared_data, "result", tempFile))
+    
+    p.start()      # run child process
+    p.join()       # wait for the process to complete
+    p.terminate()  # terminate the process (optional - should happen automatically)
+
+    # 07 Remove uploaded file
+    if os.path.isfile(tempFile):
+        os.remove(tempFile)
+
+    # 08 Get transcription from shared data and delete
+    data = shared_data["result"]
     return {'success': True, 'data':data}
 
 @server.route('/transcript', methods=['POST'])
