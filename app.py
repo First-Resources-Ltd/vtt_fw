@@ -74,22 +74,33 @@ def transcript():
     tempFile = os.path.join(os.environ['UPLOAD_FOLDER'], f'{tempName}_{audio_file.filename}')
     
     # 04 Read Open & Write audio data to file uploaded files
+    # audio_file.save(tempFile)
     audio_data = audio_file.read()
     with open(tempFile, 'wb') as f:
         f.write(audio_data)
+        f.close()
+    # 05 Set up a process manager
+    process_manager = Manager()
+    shared_data = process_manager.dict()
+    
+    # 06 Create child process for whisper execution
+    p = Process(target=_do_transcribe, args=(shared_data, "result", tempFile))
+    
+    p.start()      # run child process
+    p.join()       # wait for the process to complete
+    p.terminate()  # terminate the process (optional - should happen automatically)
 
-    # 05 load model and start transcribe audio to text
-    model = WhisperModel(modelPath, compute_type="int8")
-    segments, info = model.transcribe(tempFile, beam_size=1)
-    data = ''
-    for segment in segments:
-        data += segment.text
-
-    # 06 Remove uploaded file
+    # 07 Remove uploaded file
     if os.path.isfile(tempFile):
         os.remove(tempFile)
-    
-    del model
+
+    # 08 Get transcription from shared data and delete
+    data = shared_data["result"]
+    del audio_file
+    del audio_data
+    del tempFile
+    del shared_data
+    del process_manager
 
     return {'success': True, 'data':data}
 
@@ -134,6 +145,7 @@ def transcript_new():
     tempFile = os.path.join(os.environ['UPLOAD_FOLDER'], f'{tempName}_{audio_file.filename}')
     
     # 04 Read Open & Write audio data to file uploaded files
+    # audio_file.save(tempFile)
     audio_data = audio_file.read()
     with open(tempFile, 'wb') as f:
         f.write(audio_data)
@@ -158,6 +170,8 @@ def transcript_new():
     del audio_file
     del audio_data
     del tempFile
+    del shared_data
+    del process_manager
 
     return {'success': True, 'data':data}
 
@@ -178,3 +192,4 @@ def _do_transcribe(shared_data: dict, rid: str, tempFile: str):
     finally:
         # Release model resources
         del model
+        del info
