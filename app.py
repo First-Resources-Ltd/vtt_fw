@@ -104,6 +104,10 @@ def transcript():
     
     data = process_transcribe(tempFile)
 
+    # 05 Remove uploaded file
+    if os.path.isfile(tempFile):
+        os.remove(tempFile)
+
     return {'success': True, 'data':data}
 
 @server.route('/clear_uploaded_files', methods=['GET'])
