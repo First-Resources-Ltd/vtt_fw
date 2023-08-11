@@ -22,7 +22,7 @@ services:
     ports:
       - ${PORT}:${EXPOSE_PORT}
     command: >
-      bash -c "gunicorn --workers=${WORKERS} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER_CLASS} --timeout=${TIMEOUT} --access-logfile=${ACCESS_LOG_FILE} --error-logfile=${ERROR_LOG_FILE} --log-level=${LOG_LEVEL} --reload wsgi:server "
+      bash -c "gunicorn --workers=${WORKERS} --threads=${THREADS} --bind=${HOST}:${EXPOSE_PORT} --worker-class=${WORKER_CLASS} --timeout=${TIMEOUT} --access-logfile=${ACCESS_LOG_FILE} --error-logfile=${ERROR_LOG_FILE} --log-level=${LOG_LEVEL} --reload --worker-tmp-dir /dev/shm --log-file=- wsgi:server "
   restarter:
     image: docker:cli
     container_name: "${RESTARTER_NAME}"
