@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voice-to-text-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voice-to-text
+  template:
+    metadata:
+      labels:
+        app: voice-to-text
+        version: v4
+    spec:
+      containers:
+        - name: voice-to-text
+          image: marvinhris/voice-to-text
+          envFrom:
+            - configMapRef:
+                name: voice-to-text-configmap
+          resources:
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          ports:
+            - containerPort: 5000
+          command: ["bash", "-c"]
+          args:
+            - "gunicorn --workers=2 --threads=2 --bind=0.0.0.0:5000 --worker-class=gthread --timeout=60 --access-logfile=/var/log/gunicorn/access.log --error-logfile=/var/log/gunicorn/error.log --log-level=info --reload --worker-tmp-dir /dev/shm --log-file=- wsgi:server"

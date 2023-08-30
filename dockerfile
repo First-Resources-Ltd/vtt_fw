@@ -1,4 +1,4 @@
-FROM python:3.10.12-slim
+FROM python:3.10.13-slim
 
 # Install required system packages
 RUN apt-get update && apt-get install -y \
